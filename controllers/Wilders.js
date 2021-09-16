@@ -1,31 +1,19 @@
-const WilderModel = require('./../models/Wider');
+const WilderModel = require('./../models/Wilder');
 
 module.exports = {
-    create: (req, res) => {
+    create: async (req, res) => {
+        await WilderModel.init();
         const wilder = new WilderModel(req.body);
-        wilder
-            .save()
-            .then(() => {
-                res.json({ success: true });
-            })
-            .catch(() => {
-                res.json({ success: false });
-            })
+        await wilder.save();
+        res.json({ success: true });
     },
-    read: (req, res) => {
-        WilderModel.find()
-        .then((wilders) => {
-            res.json(wilders);
-        })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).json({ error: err });
-        });
+    read: async (req, res) => {
+        res.json(await WilderModel.find());
     },
     update: (req, res) => {
         // PATCH /api/wilders/update/:wilderId → Body → modifications
         WilderModel.findById(req.params.wilderId).then(wilder => {
-            if(wilder) {
+            if (wilder) {
                 Object.assign(wilder, req.body);
                 wilder.save().then(() => {
                     res.json({ success: true });
@@ -37,9 +25,9 @@ module.exports = {
                 res.status(404).json({ error: 'notfound' });
             }
         })
-        .catch((err) => {
-            console.error(err);
-            res.status(500).json({ error: err });
-        });
+            .catch((err) => {
+                console.error(err);
+                res.status(500).json({ error: err });
+            });
     }
 }
